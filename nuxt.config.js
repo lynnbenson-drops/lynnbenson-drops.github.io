@@ -1,7 +1,7 @@
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
-
+  server: { port: 5000 },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'drops',
@@ -18,7 +18,9 @@ export default {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
-
+  router: {
+    base: '/drops/'
+  },
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
   ],
@@ -34,6 +36,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/tailwindcss
     '@nuxtjs/tailwindcss',
+    '@nuxt/image',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -43,7 +46,9 @@ export default {
   ],
 
   // Content module configuration: https://go.nuxtjs.dev/config-content
-  content: {},
+  content: {
+    fullTextSearchFields: ['content'],
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
