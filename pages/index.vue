@@ -1,40 +1,53 @@
 <template lang='pug'>
-  .drops.p-6
-    h1.text-6xl.mb-2 Lynn Benson
-    h2.text-2xl.mb-2 Drops
+  .drops.p-8
+    Header
     .mb-4
-      input.shadow-md.border-2.rounded-md.p-2(v-model='q' placeholder='Search' class='hover:border-red-900')
+      pre {{query}}
+      input.shadow-md.border-2.rounded-md.p-2.w-80(v-model='q' placeholder='Search' class='focus-within:border-green-400 hover:border-green-800')
     .mb-4
       h3 Showing {{drops.length}} of 844
     .grid.gap-5(class='grid-cols-2 md:grid-cols-5')
       .image(v-for='drop in drops')
-        nuxt-img.mb-3.bg-red-50(:src="`images/${imageFile(drop.id)}`" sizes='sm:400px md:600px')
+        .mb-3
+          router-link(:to='`${drop.id}`' v-if='drop.photo')
+            nuxt-img.bg-red-50(:src="`images/${imageFile(drop.id)}`" sizes='sm:400px md:600px')
+          .noimage.bg-red-50(v-else)
+            nuxt-img(src='images/noimage.png')
+            //- p Image Coming Soon
         p {{drop.content}}
 </template>
 
 <script>
+import Header from '~/components/Header'
+
 export default {
-  name: 'IndexPage',
-  // https://docs.google.com/spreadsheets/d/e/2PACX-1vReJ5d0iwWnJRf8bW_JIF1sQD7_wHV_londa8S3fjHv_vRSqx1dVzlzxU11_RKaF_shdVAk28cbqDaa/pub?gid=1774686217&single=true&output=csv
+  components: { Header },
+  name: 'Drops',
   data() {
     return {
-      q: null
+      q: '',
     }
   },
+  mounted() {
+    // console.log(this.$route.query);
+    this.q = this.$route.query.q
+  },
   watch: {
-    async q() {
-      if(this.q.length > 3) {
-        this.drops = await this.$content('drops')
-          .search('content', this.q)
-          .fetch()
-      }
-      else {
-        this.drops = await this.$content('drops')
-          .sortBy('id')
-          .limit(40)
-          .fetch()
-      }
-    }
+     async q() {
+       await this.sleep(300)
+       this.$router.push({ query: { q: this.q }})
+        if(this.q.length > 3) {
+          this.drops = await this.$content('drops')
+            .search('content', this.q)
+            .fetch()
+        }
+        else {
+          this.drops = await this.$content('drops')
+            .sortBy('id')
+            .limit(40)
+            .fetch()
+        }
+    },
   },
   async asyncData( { $content, params }) {
     const drops = await $content('drops')
@@ -44,6 +57,10 @@ export default {
     return { drops }
   },
   methods: {
+    async sleep(milliseconds=3200) {
+      console.log('setting', milliseconds);
+      return new Promise(resolve => setTimeout(resolve, milliseconds))
+    },
     imageFile(number) {
       const file = ('0000' + number).substr(-4, 4)
       try {
@@ -51,7 +68,7 @@ export default {
         return `${file}.jpg`
       }
       catch (e) {
-        return 'noimage.png'
+        return 'camera.png'
       }
     },
     imageName(number) {
