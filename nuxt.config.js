@@ -37,6 +37,7 @@ export default {
     // https://go.nuxtjs.dev/tailwindcss
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
+    '@nuxtjs/google-fonts',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -52,5 +53,13 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-  }
+  },
+  googleFonts: {
+    families: {
+      Raleway: {
+        wght: [100, 400],
+        ital: [100]
+      },
+    }
+  },
 }
