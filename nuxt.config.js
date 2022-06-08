@@ -27,6 +27,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    'plugins/vue-paginate',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -44,8 +45,15 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
+    'nuxt-algolia',
   ],
 
+  publicRuntimeConfig: {
+    algolia: {
+      apiKey: '51caa65b7edf6850622939e82d9b6766',
+      applicationId: '2F04D55N46',
+    }
+  },
   // Content module configuration: https://go.nuxtjs.dev/config-content
   content: {
     fullTextSearchFields: ['content'],
@@ -57,7 +65,7 @@ export default {
   googleFonts: {
     families: {
       Raleway: {
-        wght: [100, 400],
+        wght: [100, 400, 600],
         ital: [100]
       },
     }

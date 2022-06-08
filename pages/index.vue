@@ -2,21 +2,21 @@
   .drops.p-8
     Header
     .mb-4
-      pre {{query}}
-      input.shadow-md.border-2.rounded-md.p-2.w-80(v-model='q' placeholder='Search' class='focus-within:border-green-400 hover:border-green-800')
-    .mb-4
-      h3 Showing {{drops.length}} of 844
+      b-form-input.shadow-md.border-2.rounded-md.p-2.mr-4.w-80(class='focus-within:border-green-400 hover:border-green-800' v-model='q' debounce='300' placeholder='Search')
+      a.border-b-4.border-white.pb-2(href='/' class='hover:border-green-400' v-if='q.length > 0') Clear search
+    .mb-4.flex.justify-between
+      h3 Showing {{first_drop}} - {{last_drop}} of {{total}}
+      .pages.flex
+        b-pagination(v-model='page' :total-rows='total' :per-page='20')
     .grid.gap-5(class='grid-cols-2 md:grid-cols-5')
       .image(v-for='drop in drops')
-        .mb-3
-          router-link(:to='`${drop.id}`' v-if='drop.photo')
-            nuxt-img.bg-red-50(:src="`images/${imageFile(drop.id)}`" sizes='sm:400px md:600px')
-          .noimage.bg-red-50(v-else)
+        .mb-4
+          router-link(:to='dropLink(drop)' v-if='drop.photo == "true"')
+            nuxt-img(:src="`images/${imageFile(drop.id)}`" sizes='sm:200px md:400px lg:600px')
+          .noimage(v-else)
             nuxt-img(src='images/noimage.png')
-            //- p Image Coming Soon
-        p {{drop.content}}
+        div(v-html='drop._highlightResult.content.value')
 </template>
-
 <script>
 import Header from '~/components/Header'
 
@@ -26,42 +26,69 @@ export default {
   data() {
     return {
       q: '',
+      total: 0,
+      page: 1
     }
   },
   mounted() {
-    // console.log(this.$route.query);
-    this.q = this.$route.query.q
+    if(this.$route.query.q)
+      this.q = this.$route.query.q
+    if(this.$route.query.page)
+      this.page = this.$route.query.page
+  },
+  async asyncData( { $algolia, query }) {
+    const index = $algolia.initIndex('Drops')
+    const q = query.q || ''
+    const page = query.page - 1 || 0
+    const results = await index.search(q, { page: page, hitsPerPage: 20 })
+    return { drops: results.hits, q: q, total: results.nbHits, page: page }
   },
   watch: {
-     async q() {
-       await this.sleep(300)
-       this.$router.push({ query: { q: this.q }})
-        if(this.q.length > 3) {
-          this.drops = await this.$content('drops')
-            .search('content', this.q)
-            .fetch()
-        }
-        else {
-          this.drops = await this.$content('drops')
-            .sortBy('id')
-            .limit(40)
-            .fetch()
-        }
+    the_query() {
+      this.search()
     },
   },
-  async asyncData( { $content, params }) {
-    const drops = await $content('drops')
-      .sortBy('id')
-      .limit(40)
-      .fetch()
-    return { drops }
+  computed: {
+    the_query() {
+      var query = '?'
+      if(this.q.length > 0)
+        query += `q=${this.q}&`
+      if(this.page > 1)
+        query += `page=${this.page}&`
+      
+      return query
+    },
+    pages() {
+      return Math.ceil(this.total / 20)
+    },
+    first_drop() {
+      return 1+ (this.page-1) * 20
+    },
+    last_drop() {
+      return this.first_drop + this.drops.length - 1
+    }
   },
   methods: {
-    async sleep(milliseconds=3200) {
-      console.log('setting', milliseconds);
-      return new Promise(resolve => setTimeout(resolve, milliseconds))
+    async search() {
+      const index = this.$algolia.initIndex('Drops')
+      const results = await index.search(this.q, { page: this.page-1, hitsPerPage: 20 })
+      this.$router.push({ query: { q: this.q, page: this.page }})
+      this.drops = results.hits
+      this.total = results.nbHits
     },
     imageFile(number) {
+      const file = ('0000' + number).substr(-4, 4)
+      return `${file}.jpg`
+    },
+    dropLink(drop) {
+      var query = '?'
+      if(this.q?.length > 0)
+        query += `q=${this.q}&`
+      if(this.page > 0)
+        query += `page=${this.page}`
+      return `${drop.id}${query}`
+    },
+    imageFilex(number) {
       const file = ('0000' + number).substr(-4, 4)
       try {
         require(`../static/images/${file}.jpg`)
@@ -78,4 +105,23 @@ export default {
 }
 </script>
 <style lang='sass'>
+  em
+    font-style: normal
+    color: rgb(6, 95, 70)
+    font-weight: 600
+    // background: rgb(186, 186, 186)
+  ul.pagination
+    display: flex
+    border: 1px solid #ccc
+    li
+      padding: 4px 10px
+      border-right: 1px solid #ccc
+      &:last-of-type
+        border: 0px
+      &.active
+        background: #eee
+      &:hover
+        background: rgb(6, 95, 70)
+        color: white
+        pointer: cursor
 </style>

@@ -4,12 +4,19 @@
   .grid.gap-4(class='grid-cols-1 md:grid-cols-12')
     .col-span-1(class='md:col-span-2')
       .mb-10
-        router-link.back.inline-flex.items-center.border-b-4.border-white.pb-2(to='/' class='hover:border-green-400')
+        .mb-2
+          router-link.back.inline-flex.items-center.border-b-4.border-white.pb-2(to='/' class='hover:border-green-400')
             .mr-2
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M9.375 233.4l128-128c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L109.3 224H480c17.69 0 32 14.31 32 32s-14.31 32-32 32H109.3l73.38 73.38c12.5 12.5 12.5 32.75 0 45.25c-12.49 12.49-32.74 12.51-45.25 0l-128-128C-3.125 266.1-3.125 245.9 9.375 233.4z"/></svg>
             | Back to all
+        router-link.back.inline-flex.items-center.border-b-4.border-white.pb-2.cursor-pointer(:to='back_link' class='hover:border-green-400' v-if='back_link')
+          .mr-2
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M9.375 233.4l128-128c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L109.3 224H480c17.69 0 32 14.31 32 32s-14.31 32-32 32H109.3l73.38 73.38c12.5 12.5 12.5 32.75 0 45.25c-12.49 12.49-32.74 12.51-45.25 0l-128-128C-3.125 266.1-3.125 245.9 9.375 233.4z"/></svg>
+          | Back to search
+          
       h1.text-2xl.mb-3.tracking-widest.border-black No {{formattedNumber(drop.id)}}
       p {{drop.content}}
+      h1 {{has_back}}
     .col-span-1(class='md:col-span-10')
       nuxt-img(:src='`images/${imageFile(drop.id)}`')
 </template>
@@ -19,6 +26,16 @@ import Header from '~/components/Header'
 
 export default {
   components: { Header },
+  computed: {
+    back_link() {
+      var link = '/?'
+      if(this.$route.query.q)
+        link += `q=${this.$route.query.q}&`
+      if(this.$route.query.page)
+        link += `page=${this.$route.query.page}&`
+      return link
+    }
+  },
   async asyncData( { $content, params }) {
     const drop = await $content('drops', params.id).fetch()
     return { drop }
