@@ -3,12 +3,12 @@
     Header
     .mb-4
       b-form-input.shadow-md.border-2.rounded-md.p-2.mr-4.w-80(class='focus-within:border-green-400 hover:border-green-800' v-model='q' debounce='300' placeholder='Search')
-      a.border-b-4.border-white.pb-2(href='/' class='hover:border-green-400' v-if='q.length > 0') Clear search
+      a.border-b-4.border-white.pb-2(href='/drops' class='hover:border-green-400' v-if='q.length > 0') Clear search
     .mb-4.flex.justify-between
       h3 Showing {{first_drop}} - {{last_drop}} of {{total}}
-      .pages.flex
+      .flex
         b-pagination(v-model='page' :total-rows='total' :per-page='20')
-    .grid.gap-5(class='grid-cols-2 md:grid-cols-5')
+    .grid.gap-5.mb-10(class='grid-cols-2 md:grid-cols-5')
       .image(v-for='drop in drops')
         .mb-4
           router-link(:to='dropLink(drop)' v-if='drop.photo == "true"')
@@ -16,6 +16,8 @@
           .noimage(v-else)
             nuxt-img(src='images/noimage.png')
         div(v-html='drop._highlightResult.content.value')
+    .flex.justify-end
+      b-pagination(v-model='page' :total-rows='total' :per-page='20')
 </template>
 <script>
 import Header from '~/components/Header'
@@ -27,7 +29,7 @@ export default {
     return {
       q: '',
       total: 0,
-      page: 1
+      page: null
     }
   },
   mounted() {
