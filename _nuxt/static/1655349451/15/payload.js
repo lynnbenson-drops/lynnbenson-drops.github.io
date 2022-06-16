@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/15", (function(a){return {data:[{drop:{slug:"15",id:15,content:"Unknown, possibly Columbia River Valley__no.0015, 2016.",year:2016,photo:true,dir:"\u002Fdrops",path:"\u002Fdrops\u002F15",extension:".json",createdAt:a,updatedAt:a},_img:{"/_ipx/_/images/0015.jpg":"\u002F_nuxt\u002Fimage\u002F20cb7a.jpg"}}],fetch:{},mutations:void 0}}("2022-06-16T03:13:58.134Z")));
