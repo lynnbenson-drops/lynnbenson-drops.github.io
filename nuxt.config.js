@@ -19,7 +19,7 @@ export default {
     ]
   },
   router: {
-    base: '/drops/'
+    base: '/lynnbenson-drops.github.io'
   },
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
